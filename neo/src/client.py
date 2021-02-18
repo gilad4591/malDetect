@@ -2,15 +2,18 @@
 #
 # see documentation here
 # ##
+import json
 import time
 import pprint
 import sys
 import argparse
 import os
-from neo import neo
+#from neon import neo
+import ctypes
+
+from neo.src.neo import neo
 
 API_HOST = 'https://developers.checkphish.ai/api'
-
 
 
 def submit_urls(neo_client, file_path):
@@ -42,28 +45,32 @@ def save_results(results, dir_path=''):
     pending_file_path = dir_path + 'pending.txt'
     with open(pending_file_path, 'w') as f:
         for item in results['pending']:
-            f.write(item['url'] + '\n')
+            if 'url' in item:
+                f.write(item['url'] + '\n')
     print('\nphish urls saved to file:       {0}'.format(
         os.path.abspath(pending_file_path)))
 
     phish_file_path = dir_path + 'phish.txt'
     with open(phish_file_path, 'a+') as f:
         for item in results['phish']:
-            f.write(item['url'] + '\n')
+            if 'url' in item:
+                f.write(item['url'] + '\n')
     print('\nphish urls saved to file:       {0}'.format(
         os.path.abspath(phish_file_path)))
 
     clean_file_path = dir_path + 'clean.txt'
     with open(clean_file_path, 'a+') as f:
         for item in results['clean']:
-            f.write(item['url'] + '\n')
+            if 'url' in item:
+                f.write(item['url'] + '\n')
     print('clean urls saved to file:       {0}'.format(
         os.path.abspath(clean_file_path)))
 
     suspicious_file_path = dir_path + 'suspicious.txt'
     with open(suspicious_file_path, 'a+') as f:
         for item in results['suspicious']:
-            f.write(item['url'] + '\n')
+            if 'url' in item:
+                f.write(item['url'] + item['brand'] + item['disposition'] + '\n')
     print('suspicious urls saved to file:  {0}'.format(
         os.path.abspath(suspicious_file_path)))
 
@@ -83,10 +90,10 @@ def get_results(neo_client, jobs):
                 phish.append(result)
             if result['disposition'] == 'clean':
                 clean.append(result)
-            if result['disposition'] == 'suspicious':
+            else:
                 suspicious.append(result)
         elif result['status'] == 'PENDING':
-            pending.append(result)
+            clean.append(result)
     results['jobs'] = jobs
     results['done'] = done
     results['pending'] = pending
@@ -104,6 +111,15 @@ def display_summary(results):
     print('Total phishing urls:      {0}'.format(len(results['phish'])))
     print('Total suspicious urls:    {0}'.format(len(results['suspicious'])))
     print('Total clean urls:         {0}'.format(len(results['clean'])))
+    if(len(results['suspicious'])>0):
+        info = ""
+        for dict in results['suspicious']:
+            info = info + 'Type' + ': ' + str(dict['disposition']) + '\n'
+            info = info + 'Brand' + ': ' + str(dict['brand']) + '\n'
+            info = info + 'url' + ': ' + str(dict['url']) + '\n'
+        ctypes.windll.user32.MessageBoxW(0, info, "There is suspicious activity in your computer")
+
+
 
 
 def main():
@@ -113,12 +129,14 @@ def main():
     parser.add_argument(
         '-f', '--file', help='file containing urls', required=True)
     args = parser.parse_args()
-
+    args = {}
+    #args :["-k","sffuvsq8h0yj2hn2dz48o4ycgo8dnxgppu3rciveb5oh04bxzj2md7rmsoo382sn","-f","urls_to_scan"]
     # increasing wait time further will result in fewer pending jobs
     wait_for_results = 5
-
-    neo_client = neo.Neo(args.key, API_HOST)
-    jobs = submit_urls(neo_client, args.file)
+    args['key'] = 'YourApiKey'
+    args['file'] = 'urls_to_scan.txt'
+    neo_client = neo.Neo(args['key'], API_HOST)
+    jobs = submit_urls(neo_client, args['file'])
 
     print('\n{0} urls submitted. Waiting {1}s for results'.format(
         len(jobs), wait_for_results))
