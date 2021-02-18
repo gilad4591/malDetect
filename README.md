@@ -1,4 +1,4 @@
-# malDetect ⚠️
+# MalDetect ⚠️
 
 ## Description
 MalDetect was built to check if the computer communicate with malicious ip addresses.
@@ -28,7 +28,8 @@ it will do the rest by itself 😉
 
 
 ## Screenshots
-Simple gui <p></p>
+<em>
+ Simple gui <p></p>
 <img src="https://github.com/gilad4591/malDetect/blob/master/Screenshots/ss1.jpg?raw=true" width = "250" height = "100" />
 Sniffing... <p></p>
 <img src="https://github.com/gilad4591/malDetect/blob/master/Screenshots/ss2.jpg?raw=true" width = "250" height = "100" />
@@ -36,6 +37,6 @@ Found a suspicious ip address <p></p>
 <img src="https://github.com/gilad4591/malDetect/blob/master/Screenshots/ss4.jpg" width = "250" height = "100" />
 Alert <p></p>
 <img src="https://github.com/gilad4591/malDetect/blob/master/Screenshots/ss3.jpeg" width = "250" height = "100" />
-
+</em>
 
 
